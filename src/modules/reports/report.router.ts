@@ -1,10 +1,12 @@
 import { Router } from 'express';
-import { ReportController } from './report.controler';
+import { ReportController } from './report.controller';
+import { validateCreateReport } from './validators/create-report.validator';
 
-const reportController = new ReportController();
+export const ReportRouter = (controller: ReportController) => {
+    const router = Router();
 
-const ReportRouter = Router();
+    router.get('/', controller.test.bind(controller));
+    router.post('/', validateCreateReport, controller.createNewReport.bind(controller));
 
-ReportRouter.get('/', reportController.test.bind(reportController));
-
-export { ReportRouter };
+    return router;
+};

@@ -1,8 +1,11 @@
 import { Router } from 'express';
-import { ReportRouter } from './modules/reports/report.router';
+import { buildReportModule } from './modules/reports';
+import dbInstanse from './database';
 
 const AppRouter = Router();
 
-AppRouter.use('/reports', ReportRouter);
+const reportModule = buildReportModule(dbInstanse);
+
+AppRouter.use('/reports', reportModule.router);
 
 export { AppRouter };
