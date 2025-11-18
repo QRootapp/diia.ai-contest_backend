@@ -1,5 +1,8 @@
 import { Knex } from 'knex';
 import { TNodeEnv } from './types';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const dbConfig: { [key: string]: Knex.Config } = {
     development: {
@@ -37,10 +40,6 @@ const dbConfig: { [key: string]: Knex.Config } = {
 
 const env = process.env.NODE_ENV as TNodeEnv;
 
-console.log('env :>> ', env);
-
 const config = dbConfig[env]!;
-
-console.log('config :>> ', config);
 
 export default config;
