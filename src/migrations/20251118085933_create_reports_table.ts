@@ -3,7 +3,6 @@ import type { Knex } from 'knex';
 export async function up(knex: Knex): Promise<void> {
     return knex.schema.createTable('reports', function (table) {
         table.increments('id').primary();
-        table.integer('user_id').unsigned().notNullable();
         table.string('vehicle_license_plate', 20).notNullable();
         table.decimal('latitude', 10, 8).notNullable();
         table.decimal('longitude', 11, 8).notNullable();
@@ -15,8 +14,6 @@ export async function up(knex: Knex): Promise<void> {
         table.timestamp('submitted_at').nullable();
         table.timestamps(true, true);
 
-        table.foreign('user_id').references('users.id').onDelete('CASCADE');
-        table.index('user_id');
         table.index('status');
         table.index('vehicle_license_plate');
         table.index('created_at');
