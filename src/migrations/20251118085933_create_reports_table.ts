@@ -6,7 +6,6 @@ export async function up(knex: Knex): Promise<void> {
         table.string('vehicle_license_plate', 20).notNullable();
         table.decimal('latitude', 10, 8).notNullable();
         table.decimal('longitude', 11, 8).notNullable();
-        table.string('address', 500).notNullable();
         table.enum('status', ['draft', 'submitted', 'under_review', 'resolved', 'rejected']).defaultTo('draft').notNullable();
         table.timestamp('first_photo_at').defaultTo(knex.fn.now()).notNullable();
         table.timestamp('confirmation_photo_at').nullable();
