@@ -3,13 +3,16 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+import db from './database';
+
 const app = express();
 const port = process.env.PORT;
 
 app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
-    res.send('Server is running!');
+app.get('/', async (req: Request, res: Response) => {
+    const result = await db.raw('SELECT 1 + 1 AS result');
+    res.json(result);
 });
 
 app.listen(port, () => {
