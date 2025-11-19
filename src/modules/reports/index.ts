@@ -3,17 +3,23 @@ import { ReportService } from './report.service';
 import { ReportController } from './report.controller';
 import { ReportRouter } from './report.router';
 import { Knex } from 'knex';
+import { ReportsPhotosRepository } from '../reports-photos/reports-photos.repository';
+import { ReportsPhotosService } from '../reports-photos/reports-photos.service';
+import { S3UploaderService } from '../s3-uploader/s3-uploader.service';
 
 export function buildReportModule(db: Knex) {
-    const repo = new ReportRepository(db);
-    const service = new ReportService(repo);
-    const controller = new ReportController(service);
+    const reportsRepository = new ReportRepository(db);
+    const reportsPhotosRepository = new ReportsPhotosRepository(db);
+
+    const s3UploaderService = new S3UploaderService();
+
+    const reportsPhotosService = new ReportsPhotosService(s3UploaderService, reportsPhotosRepository);
+    const reportsService = new ReportService(reportsPhotosService, reportsRepository);
+
+    const controller = new ReportController(reportsService);
     const router = ReportRouter(controller);
 
     return {
-        repo,
-        service,
-        controller,
         router,
     };
 }
