@@ -63,6 +63,10 @@ export class ReportService {
         return report;
     }
 
+    public async getReports(page: number, limit: number) {
+        return await this.reportRepository.getReportsWithPhotos(page, limit);
+    }
+
     private prepareUpdateReportData(dto: UpdateReportDto): IUpdateReport {
         return {
             status: EReportStatus.Submitted,

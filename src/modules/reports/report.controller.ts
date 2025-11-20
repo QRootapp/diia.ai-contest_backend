@@ -48,4 +48,14 @@ export class ReportController {
             next(err);
         }
     }
+
+    public async getReports(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { page = '1', limit = '10' } = req.query;
+            const result = await this.reportService.getReports(+page, +limit);
+            res.status(200).send(result);
+        } catch (err) {
+            next(err);
+        }
+    }
 }

@@ -12,5 +12,7 @@ export const ReportRouter = (controller: ReportController) => {
 
     router.get('/:id', validateGetReportById, controller.getReportById.bind(controller));
 
+    router.get('/', controller.getReports.bind(controller));
+
     return router;
 };

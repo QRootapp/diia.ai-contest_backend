@@ -52,4 +52,40 @@ export class ReportRepository {
             return id;
         });
     }
+
+    public async getReportsWithPhotos(page: number = 1, limit: number = 10) {
+        const offset = (page - 1) * limit;
+
+        const countResult = await this.repository('reports').count('id as count');
+        const total = countResult[0] && countResult[0].count ? Number(countResult[0].count) : 0;
+
+        const reports = await this.repository('reports')
+            .select(
+                'reports.*',
+                this.repository.raw(
+                    'COALESCE(JSON_ARRAYAGG(JSON_OBJECT(' +
+                        '"id", report_photos.id,' +
+                        '"photo_url", report_photos.photo_url,' +
+                        '"photo_type", report_photos.photo_type,' +
+                        '"latitude", report_photos.latitude,' +
+                        '"longitude", report_photos.longitude,' +
+                        '"taken_at", report_photos.taken_at,' +
+                        '"ocr_confidence", report_photos.ocr_confidence,' +
+                        '"recognized_plate", report_photos.recognized_plate' +
+                        ')), JSON_ARRAY()) as photos'
+                )
+            )
+            .leftJoin('report_photos', 'report_photos.report_id', 'reports.id')
+            .groupBy('reports.id')
+            .orderBy('reports.created_at', 'desc')
+            .limit(limit)
+            .offset(offset);
+
+        return {
+            data: reports,
+            total,
+            page,
+            limit,
+        };
+    }
 }
