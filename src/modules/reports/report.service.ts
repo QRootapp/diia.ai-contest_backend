@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { AiClientService } from '../ai-client/ai-client.service';
-import { ICarsResponse } from '../ai-client/interfaces';
+import { ICarInfo, ICarsResponse } from '../ai-client/interfaces';
 import { ReportsPhotosService } from '../reports-photos/reports-photos.service';
 import { CreateReportDto } from './dto';
 import { EReportStatus } from './enums';
@@ -65,6 +65,19 @@ export class ReportService {
 
     public async getReports(page: number, limit: number) {
         return await this.reportRepository.getReportsWithPhotos(page, limit);
+    }
+
+    public async getPlate(file: Express.Multer.File) {
+        const carsInfo = await this.aiClientService.getPhotoMetaData(file);
+        return this.getPlateInfo(carsInfo);
+    }
+
+    private getPlateInfo(carsInfo: ICarsResponse) {
+        const { plate, confidence } = carsInfo.cars[0] as ICarInfo;
+        return {
+            plate,
+            confidence,
+        };
     }
 
     private prepareUpdateReportData(dto: UpdateReportDto): IUpdateReport {

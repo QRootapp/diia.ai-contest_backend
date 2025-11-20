@@ -58,4 +58,15 @@ export class ReportController {
             next(err);
         }
     }
+
+    public async getPlate(req: Request, res: Response, next: NextFunction) {
+        try {
+            const file = req.file;
+            if (!file) throw new ValidationError(['Image required']);
+            const result = await this.reportService.getPlate(file);
+            res.status(201).send(result);
+        } catch (err) {
+            next(err);
+        }
+    }
 }

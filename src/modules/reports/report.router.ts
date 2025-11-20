@@ -14,5 +14,7 @@ export const ReportRouter = (controller: ReportController) => {
 
     router.get('/', controller.getReports.bind(controller));
 
+    router.post('/check-plate', upload.single('file'), controller.getPlate.bind(controller));
+
     return router;
 };
