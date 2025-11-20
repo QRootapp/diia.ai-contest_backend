@@ -9,6 +9,14 @@ export const validateCreateReport = [
 
     body('createdAt').exists().withMessage('CreatedAt is required').isISO8601().toDate().withMessage('CreatedAt must be a valid date'),
 
+    body('vehicleLicensePlate').exists().withMessage('VehicleLicensePlate is required').isString().withMessage('VehicleLicensePlate must be a string'),
+
+    body('firstName').exists().withMessage('FirstName is required').isString().withMessage('FirstName must be a string'),
+
+    body('lastName').exists().withMessage('LastName is required').isString().withMessage('LastName must be a string'),
+
+    body('middleName').exists().withMessage('MiddleName is required').isString().withMessage('MiddleName must be a string'),
+
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {

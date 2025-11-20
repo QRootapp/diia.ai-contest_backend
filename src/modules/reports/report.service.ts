@@ -20,7 +20,7 @@ export class ReportService {
     public async createNewReport(createReportDto: CreateReportDto, file: Express.Multer.File) {
         const photoMeta = await this.aiClientService.getPhotoMetaData(file);
 
-        const createReportData = this.prepareCreateReportData(createReportDto, photoMeta);
+        const createReportData = this.prepareCreateReportData(createReportDto);
 
         const recognizedData = this.getRecognizedData(photoMeta);
 
@@ -73,15 +73,16 @@ export class ReportService {
         return;
     }
 
-    private prepareCreateReportData(dto: CreateReportDto, photoMeta: ICarsResponse): ICreateReport {
-        const plate = photoMeta.cars[0]?.plate ?? '';
-
+    private prepareCreateReportData(dto: CreateReportDto): ICreateReport {
         return {
             status: EReportStatus.Draft,
             first_photo_at: this.formatDate(dto.createdAt),
-            vehicle_license_plate: plate,
+            vehicle_license_plate: dto.vehicleLicensePlate,
             latitude: Number(dto.latitude),
             longitude: Number(dto.longitude),
+            first_name: dto.firstName,
+            last_name: dto.lastName,
+            middle_name: dto.middleName,
         };
     }
 
