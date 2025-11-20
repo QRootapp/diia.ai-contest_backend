@@ -57,6 +57,12 @@ export class ReportService {
         return await this.reportRepository.getReportById(id);
     }
 
+    public async getReportById(id: number) {
+        const report = await this.reportRepository.getReportById(id);
+        if (!report) throw new AppError('Report Not Found', 404);
+        return report;
+    }
+
     private prepareUpdateReportData(dto: UpdateReportDto): IUpdateReport {
         return {
             status: EReportStatus.Submitted,

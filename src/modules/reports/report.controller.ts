@@ -24,20 +24,26 @@ export class ReportController {
 
     public async updateReport(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = req.params.id;
-            console.log('req.file :>> ', req.file);
+            const id = req.params.id!;
             if (!req.file) {
                 throw new ValidationError(['Image required']);
-            }
-
-            if (!id) {
-                throw new ValidationError(['ID required']);
             }
 
             const body: UpdateReportDto = req.body;
             const result = await this.reportService.updateReport(+id, body, req.file);
 
             res.status(201).send(result);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    public async getReportById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const id = req.params.id!;
+
+            const result = await this.reportService.getReportById(+id);
+            res.status(200).send(result);
         } catch (err) {
             next(err);
         }
