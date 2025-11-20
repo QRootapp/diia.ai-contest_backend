@@ -6,6 +6,7 @@ import { ICreateReportPhoto } from './interfaces/create-report-photo.intarface';
 import { ReportsPhotosRepository } from './reports-photos.repository';
 import { v4 as uuidv4 } from 'uuid';
 import { IRecognizedData } from './interfaces';
+import { UpdateReportDto } from '../reports/dto/update-report.dto';
 
 export class ReportsPhotosService {
     private readonly region: string;
@@ -21,11 +22,11 @@ export class ReportsPhotosService {
     }
 
     public preparePhotoData(
-        dto: CreateReportDto,
+        dto: CreateReportDto | UpdateReportDto,
         file: Express.Multer.File,
         params: IRecognizedData
     ): { createPhotoData: ICreateReportPhoto; fileName: string } {
-        const { recognizedPlate, ocrConfidence } = params;
+        const { recognizedPlate, ocrConfidence, photoType } = params;
         const fileFormat = this.getFileFormat(file);
         const fileName = this.generateFileName(fileFormat);
         const photoUrl = this.buildPhotoUrl(fileName);
@@ -37,7 +38,7 @@ export class ReportsPhotosService {
                 latitude: Number(dto.latitude),
                 longitude: Number(dto.longitude),
                 taken_at: takenAt,
-                photo_type: EPhotoType.Initial,
+                photo_type: photoType,
                 photo_url: photoUrl,
                 recognized_plate: recognizedPlate,
                 ocr_confidence: ocrConfidence,

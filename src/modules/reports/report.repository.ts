@@ -1,5 +1,5 @@
 import { Knex } from 'knex';
-import { ICreateReport } from './interfaces';
+import { ICreateReport, IUpdateReport } from './interfaces';
 import { ICreateReportPhoto } from '../reports-photos/interfaces/create-report-photo.intarface';
 
 export class ReportRepository {
@@ -42,6 +42,14 @@ export class ReportRepository {
             const [reportId] = await trx('reports').insert(createReportData);
             await trx('report_photos').insert({ ...createPhotoData, report_id: reportId });
             return reportId!;
+        });
+    }
+
+    public async updateReportWithPhoto(id: number, updateReportData: IUpdateReport, createPhotoData: ICreateReportPhoto) {
+        return await this.repository.transaction(async (trx) => {
+            await trx('reports').update(updateReportData).where({ id });
+            await trx('report_photos').insert({ ...createPhotoData, report_id: id });
+            return id;
         });
     }
 }

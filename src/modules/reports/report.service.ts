@@ -4,8 +4,11 @@ import { ICarsResponse } from '../ai-client/interfaces';
 import { ReportsPhotosService } from '../reports-photos/reports-photos.service';
 import { CreateReportDto } from './dto';
 import { EReportStatus } from './enums';
-import { ICreateReport } from './interfaces';
+import { ICreateReport, IUpdateReport } from './interfaces';
 import { ReportRepository } from './report.repository';
+import { UpdateReportDto } from './dto/update-report.dto';
+import { EPhotoType } from '../reports-photos/enums';
+import { AppError, ValidationError } from '../../errors';
 
 export class ReportService {
     constructor(
@@ -17,19 +20,60 @@ export class ReportService {
     public async createNewReport(createReportDto: CreateReportDto, file: Express.Multer.File) {
         const photoMeta = await this.aiClientService.getPhotoMetaData(file);
 
-        const createReportData = this.prepareReportData(createReportDto, photoMeta);
+        const createReportData = this.prepareCreateReportData(createReportDto, photoMeta);
 
         const recognizedData = this.getRecognizedData(photoMeta);
 
-        const { createPhotoData, fileName } = this.reportsPhotosService.preparePhotoData(createReportDto, file, recognizedData);
+        const { createPhotoData, fileName } = this.reportsPhotosService.preparePhotoData(createReportDto, file, {
+            ...recognizedData,
+            photoType: EPhotoType.Initial,
+        });
 
         await this.reportsPhotosService.savePhotoInStorage(file, fileName);
 
         const reportId = await this.reportRepository.createReportWithPhoto(createReportData, createPhotoData);
-        return this.reportRepository.getReportById(reportId);
+
+        return await this.reportRepository.getReportById(reportId);
     }
 
-    private prepareReportData(dto: CreateReportDto, photoMeta: ICarsResponse): ICreateReport {
+    public async updateReport(id: number, updateReportDto: UpdateReportDto, file: Express.Multer.File) {
+        await this.checkReportStatus(id);
+
+        const photoMeta = await this.aiClientService.getPhotoMetaData(file);
+
+        const updateReportData = this.prepareUpdateReportData(updateReportDto);
+
+        const recognizedData = this.getRecognizedData(photoMeta);
+
+        const { createPhotoData, fileName } = this.reportsPhotosService.preparePhotoData(updateReportDto, file, {
+            ...recognizedData,
+            photoType: EPhotoType.Confirmation,
+        });
+
+        await this.reportsPhotosService.savePhotoInStorage(file, fileName);
+
+        await this.reportRepository.updateReportWithPhoto(id, updateReportData, createPhotoData);
+
+        return await this.reportRepository.getReportById(id);
+    }
+
+    private prepareUpdateReportData(dto: UpdateReportDto): IUpdateReport {
+        return {
+            status: EReportStatus.Submitted,
+            confirmation_photo_at: this.formatDate(dto.createdAt),
+            submitted_at: this.formatDate(new Date()),
+            duration_minutes: dto.durationMinutes,
+        };
+    }
+
+    private async checkReportStatus(id: number) {
+        const report = await this.reportRepository.getReportById(id);
+        if (!report) throw new AppError('Report not found', 404);
+        if (report.status !== EReportStatus.Draft) throw new ValidationError(['The report status does not match the operation']);
+        return;
+    }
+
+    private prepareCreateReportData(dto: CreateReportDto, photoMeta: ICarsResponse): ICreateReport {
         const plate = photoMeta.cars[0]?.plate ?? '';
 
         return {
