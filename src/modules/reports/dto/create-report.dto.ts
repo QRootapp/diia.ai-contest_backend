@@ -6,4 +6,5 @@ export interface CreateReportDto {
     firstName: string;
     lastName: string;
     middleName: string;
+    confidence: string;
 }

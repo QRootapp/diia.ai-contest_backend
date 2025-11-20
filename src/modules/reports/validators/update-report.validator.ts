@@ -11,6 +11,10 @@ export const validateUpdateReport = [
 
     body('durationMinutes').exists().withMessage('DurationMinutes is required').isInt().withMessage('DurationMinutes must be number'),
 
+    body('confidence').exists().withMessage('Confidence is required').isFloat().withMessage('Confidence must be a float'),
+
+    body('vehicleLicensePlate').exists().withMessage('VehicleLicensePlate is required').isString().withMessage('VehicleLicensePlate must be a string'),
+
     param('id').exists().withMessage('ID is required').isInt({ min: 1 }).withMessage('id must be a positive integer'),
 
     (req: Request, res: Response, next: NextFunction) => {

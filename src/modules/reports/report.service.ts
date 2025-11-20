@@ -18,7 +18,7 @@ export class ReportService {
     ) {}
 
     public async createNewReport(createReportDto: CreateReportDto, file: Express.Multer.File) {
-        const photoMeta = await this.aiClientService.getPhotoMetaData(file);
+        const photoMeta = this.getPhotoMeta(createReportDto);
 
         const createReportData = this.prepareCreateReportData(createReportDto);
 
@@ -39,7 +39,7 @@ export class ReportService {
     public async updateReport(id: number, updateReportDto: UpdateReportDto, file: Express.Multer.File) {
         await this.checkReportStatus(id);
 
-        const photoMeta = await this.aiClientService.getPhotoMetaData(file);
+        const photoMeta = this.getPhotoMeta(updateReportDto);
 
         const updateReportData = this.prepareUpdateReportData(updateReportDto);
 
@@ -113,10 +113,17 @@ export class ReportService {
         return dayjs(date).format('YYYY-MM-DD HH:mm:ss');
     }
 
-    private getRecognizedData(photoMeta: ICarsResponse) {
+    private getPhotoMeta(dto: CreateReportDto | UpdateReportDto): ICarInfo {
         return {
-            recognizedPlate: photoMeta.cars[0]?.plate || '',
-            ocrConfidence: photoMeta.cars[0]?.confidence || 0,
+            plate: dto.vehicleLicensePlate,
+            confidence: Number(dto.confidence),
+        };
+    }
+
+    private getRecognizedData(photoMeta: ICarInfo) {
+        return {
+            recognizedPlate: photoMeta.plate,
+            ocrConfidence: photoMeta.confidence,
         };
     }
 }

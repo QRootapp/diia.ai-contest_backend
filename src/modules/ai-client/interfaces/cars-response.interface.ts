@@ -1,6 +1,6 @@
 export interface ICarInfo {
     plate: string;
-    raw_text: string;
+    raw_text?: string;
     confidence: number;
 }
 

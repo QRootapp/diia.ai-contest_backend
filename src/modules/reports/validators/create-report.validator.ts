@@ -17,6 +17,8 @@ export const validateCreateReport = [
 
     body('middleName').exists().withMessage('MiddleName is required').isString().withMessage('MiddleName must be a string'),
 
+    body('confidence').exists().withMessage('Confidence is required').isFloat().withMessage('Confidence must be a float'),
+
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
