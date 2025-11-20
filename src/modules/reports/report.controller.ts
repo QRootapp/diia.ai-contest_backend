@@ -1,19 +1,20 @@
 import { NextFunction, Request, Response } from 'express';
 import { CreateReportDto } from './dto';
 import { ReportService } from './report.service';
+import { ValidationError } from '../../errors';
 
 export class ReportController {
     constructor(private readonly reportService: ReportService) {}
 
-    public test(req: Request, res: Response) {
-        res.status(200).send({ message: 'Hello world' });
-    }
-
     public async createNewReport(req: Request, res: Response, next: NextFunction) {
         try {
-            const image = req.image;
+            if (!req.file) {
+                throw new ValidationError(['Image required']);
+            }
+
             const body: CreateReportDto = req.body;
-            const result = await this.reportService.createNewReport(body, image);
+            const result = await this.reportService.createNewReport(body, req.file);
+
             res.status(201).send(result);
         } catch (err) {
             next(err);

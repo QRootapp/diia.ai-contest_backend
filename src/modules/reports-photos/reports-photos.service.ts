@@ -1,6 +1,57 @@
+import dayjs from 'dayjs';
+import { CreateReportDto } from '../reports/dto';
 import { S3UploaderService } from '../s3-uploader/s3-uploader.service';
+import { EPhotoType } from './enums';
+import { ICreateReportPhoto } from './interfaces/create-report-photo.intarface';
 import { ReportsPhotosRepository } from './reports-photos.repository';
+import { v4 as uuidv4 } from 'uuid';
 
 export class ReportsPhotosService {
-    constructor(private readonly s3UploaderService: S3UploaderService, private readonly reportsPhotosRepository: ReportsPhotosRepository) {}
+    private readonly region: string;
+    private readonly bucket: string;
+
+    constructor(private readonly s3UploaderService: S3UploaderService, private readonly reportsPhotosRepository: ReportsPhotosRepository) {
+        this.region = process.env.AWS_REGION!;
+        this.bucket = process.env.AWS_BUCKET!;
+    }
+
+    public async savePhotoInStorage(file: Express.Multer.File, fileName: string) {
+        await this.s3UploaderService.uploadFile(file, fileName);
+    }
+
+    public preparePhotoData(
+        dto: CreateReportDto,
+        file: Express.Multer.File,
+        recognizedPlate: string
+    ): { createPhotoData: ICreateReportPhoto; fileName: string } {
+        const fileFormat = this.getFileFormat(file);
+        const fileName = this.generateFileName(fileFormat);
+        const photoUrl = this.buildPhotoUrl(fileName);
+
+        const takenAt = dayjs(dto.createdAt).format('YYYY-MM-DD HH:mm:ss');
+
+        return {
+            createPhotoData: {
+                latitude: Number(dto.latitude),
+                longitude: Number(dto.longitude),
+                taken_at: takenAt,
+                photo_type: EPhotoType.Initial,
+                photo_url: photoUrl,
+                recognized_plate: recognizedPlate,
+            },
+            fileName,
+        };
+    }
+
+    private getFileFormat(file: Express.Multer.File) {
+        return file.mimetype.split('/')[1]!;
+    }
+
+    private generateFileName(ext: string) {
+        return `${uuidv4()}.${ext}`;
+    }
+
+    private buildPhotoUrl(fileName: string) {
+        return `https://${this.bucket}.s3.${this.region}.amazonaws.com/${fileName}`;
+    }
 }
