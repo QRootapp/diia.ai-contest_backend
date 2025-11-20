@@ -11,6 +11,9 @@ export async function up(knex: Knex): Promise<void> {
         table.timestamp('confirmation_photo_at').nullable();
         table.integer('duration_minutes').nullable();
         table.timestamp('submitted_at').nullable();
+        table.string('first_name', 255).notNullable();
+        table.string('last_name', 255).notNullable();
+        table.string('middle_name', 255).notNullable();
         table.timestamps(true, true);
 
         table.index('status');
