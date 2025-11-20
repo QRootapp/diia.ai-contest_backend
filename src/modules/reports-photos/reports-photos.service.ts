@@ -52,6 +52,6 @@ export class ReportsPhotosService {
     }
 
     private buildPhotoUrl(fileName: string) {
-        return `https://${this.bucket}.s3.${this.region}.amazonaws.com/${fileName}`;
+        return `https://s3.${this.region}.amazonaws.com/${this.bucket}/${fileName}`;
     }
 }
