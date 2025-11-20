@@ -7,4 +7,5 @@ export interface ICreateReportPhoto {
     photo_type: EPhotoType;
     photo_url: string;
     recognized_plate: string;
+    ocr_confidence: number;
 }

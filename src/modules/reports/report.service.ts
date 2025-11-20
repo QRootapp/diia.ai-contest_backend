@@ -18,7 +18,10 @@ export class ReportService {
         const photoMeta = await this.aiClientService.getPhotoMetaData(file);
 
         const createReportData = this.prepareReportData(createReportDto, photoMeta);
-        const { createPhotoData, fileName } = this.reportsPhotosService.preparePhotoData(createReportDto, file, createReportData.vehicle_license_plate);
+
+        const recognizedData = this.getRecognizedData(photoMeta);
+
+        const { createPhotoData, fileName } = this.reportsPhotosService.preparePhotoData(createReportDto, file, recognizedData);
 
         await this.reportsPhotosService.savePhotoInStorage(file, fileName);
 
@@ -40,5 +43,12 @@ export class ReportService {
 
     private formatDate(date: Date) {
         return dayjs(date).format('YYYY-MM-DD HH:mm:ss');
+    }
+
+    private getRecognizedData(photoMeta: ICarsResponse) {
+        return {
+            recognizedPlate: photoMeta.cars[0]?.plate || '',
+            ocrConfidence: photoMeta.cars[0]?.confidence || 0,
+        };
     }
 }

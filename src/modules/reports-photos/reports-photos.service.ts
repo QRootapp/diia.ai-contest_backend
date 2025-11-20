@@ -5,6 +5,7 @@ import { EPhotoType } from './enums';
 import { ICreateReportPhoto } from './interfaces/create-report-photo.intarface';
 import { ReportsPhotosRepository } from './reports-photos.repository';
 import { v4 as uuidv4 } from 'uuid';
+import { IRecognizedData } from './interfaces';
 
 export class ReportsPhotosService {
     private readonly region: string;
@@ -22,8 +23,9 @@ export class ReportsPhotosService {
     public preparePhotoData(
         dto: CreateReportDto,
         file: Express.Multer.File,
-        recognizedPlate: string
+        params: IRecognizedData
     ): { createPhotoData: ICreateReportPhoto; fileName: string } {
+        const { recognizedPlate, ocrConfidence } = params;
         const fileFormat = this.getFileFormat(file);
         const fileName = this.generateFileName(fileFormat);
         const photoUrl = this.buildPhotoUrl(fileName);
@@ -38,6 +40,7 @@ export class ReportsPhotosService {
                 photo_type: EPhotoType.Initial,
                 photo_url: photoUrl,
                 recognized_plate: recognizedPlate,
+                ocr_confidence: ocrConfidence,
             },
             fileName,
         };
