@@ -98,6 +98,7 @@ export class ReportService {
     }
 
     private prepareCreateReportData(dto: CreateReportDto): ICreateReport {
+        const reportNumber = this.generateIdFromTime();
         return {
             status: EReportStatus.Draft,
             first_photo_at: this.formatDate(dto.createdAt),
@@ -107,6 +108,7 @@ export class ReportService {
             first_name: dto.firstName,
             last_name: dto.lastName,
             middle_name: dto.middleName,
+            report_number: reportNumber,
         };
     }
 
@@ -126,5 +128,11 @@ export class ReportService {
             recognizedPlate: photoMeta.plate,
             ocrConfidence: photoMeta.confidence,
         };
+    }
+
+    public generateIdFromTime(): string {
+        const timestamp = Date.now();
+        const random = Math.floor(Math.random() * 1000000);
+        return `${timestamp}-${random}`;
     }
 }

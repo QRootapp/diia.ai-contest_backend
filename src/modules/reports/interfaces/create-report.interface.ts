@@ -9,4 +9,5 @@ export interface ICreateReport {
     first_name: string;
     last_name: string;
     middle_name: string;
+    report_number: string;
 }
