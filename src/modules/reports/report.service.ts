@@ -9,6 +9,7 @@ import { ReportRepository } from './report.repository';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { EPhotoType } from '../reports-photos/enums';
 import { AppError, ValidationError } from '../../errors';
+import { IRecognizedData } from '../reports-photos/interfaces';
 
 export class ReportService {
     constructor(
@@ -67,12 +68,12 @@ export class ReportService {
         return await this.reportRepository.getReportsWithPhotos(page, limit);
     }
 
-    public async getPlate(file: Express.Multer.File) {
+    public async getPlate(file: Express.Multer.File): Promise<Omit<ICarInfo, 'raw_text'>> {
         const carsInfo = await this.aiClientService.getPhotoMetaData(file);
         return this.getPlateInfo(carsInfo);
     }
 
-    private getPlateInfo(carsInfo: ICarsResponse) {
+    private getPlateInfo(carsInfo: ICarsResponse): Omit<ICarInfo, 'raw_text'> {
         const { plate, confidence } = carsInfo.cars[0] as ICarInfo;
         return {
             plate,
@@ -89,7 +90,7 @@ export class ReportService {
         };
     }
 
-    private async checkReportStatus(id: number) {
+    private async checkReportStatus(id: number): Promise<void> {
         const report = await this.reportRepository.getReportById(id);
         if (!report) throw new AppError('Report not found', 404);
         if (report.status !== EReportStatus.Draft) throw new ValidationError(['The report status does not match the operation']);
@@ -120,7 +121,7 @@ export class ReportService {
         };
     }
 
-    private getRecognizedData(photoMeta: ICarInfo) {
+    private getRecognizedData(photoMeta: ICarInfo): Omit<IRecognizedData, 'photoType'> {
         return {
             recognizedPlate: photoMeta.plate,
             ocrConfidence: photoMeta.confidence,
