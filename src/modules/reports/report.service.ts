@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { AiClientService } from '../ai-client/ai-client.service';
-import { ICarInfo, ICarsResponse } from '../ai-client/interfaces';
+import { ICarInfo, ICarInfoRes, ICarsResponse } from '../ai-client/interfaces';
 import { ReportsPhotosService } from '../reports-photos/reports-photos.service';
 import { CreateReportDto } from './dto';
 import { EReportStatus } from './enums';
@@ -68,13 +68,24 @@ export class ReportService {
         return await this.reportRepository.getReportsWithPhotos(page, limit);
     }
 
-    public async getPlate(file: Express.Multer.File): Promise<Omit<ICarInfo, 'raw_text'>> {
+    public async getPlate(file: Express.Multer.File): Promise<Omit<ICarInfoRes, 'raw_text'>> {
         const carsInfo = await this.aiClientService.getPhotoMetaData(file);
+
         return this.getPlateInfo(carsInfo);
     }
 
-    private getPlateInfo(carsInfo: ICarsResponse): Omit<ICarInfo, 'raw_text'> {
-        const { plate, confidence } = carsInfo.cars[0] as ICarInfo;
+    private getPlateInfo(carsInfo: ICarsResponse): Omit<ICarInfoRes, 'raw_text'> {
+        if (!carsInfo.cars.length) {
+            return {
+                plate: null,
+                confidence: null,
+            };
+        }
+
+        const best = carsInfo.cars.reduce((max, cur) => (cur.confidence > max.confidence ? cur : max));
+
+        const { plate = null, confidence = null } = best;
+
         return {
             plate,
             confidence,
