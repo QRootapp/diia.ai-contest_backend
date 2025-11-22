@@ -4,21 +4,24 @@ import FormData from 'form-data';
 
 export class AiClientService {
     public async getPhotoMetaData(image: Express.Multer.File): Promise<ICarsResponse> {
-        const form = new FormData();
-        form.append('file', image.buffer, {
-            filename: image.originalname,
-            contentType: image.mimetype,
+        // const form = new FormData();
+        // form.append('file', image.buffer, {
+        //     filename: image.originalname,
+        //     contentType: image.mimetype,
+        // });
+
+        // const response = await axios.post('http://host.docker.internal:8000/detect', form, {
+        //     headers: {
+        //         ...form.getHeaders(),
+        //     },
+        // });
+
+        // return response.data;
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(this.getMockCars());
+            }, 100);
         });
-
-        const response = await axios.post('http://host.docker.internal:8000/detect', form, {
-            headers: {
-                ...form.getHeaders(),
-            },
-        });
-
-        console.log('response :>> ', response);
-
-        return response.data;
     }
 
     private getMockCars() {
