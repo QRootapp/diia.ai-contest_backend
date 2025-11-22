@@ -10,7 +10,7 @@ export class AiClientService {
             contentType: image.mimetype,
         });
 
-        const response: ICarsResponse = await axios.post('http://host.docker.internal:8000/detect', form, {
+        const response = await axios.post('http://host.docker.internal:8000/detect', form, {
             headers: {
                 ...form.getHeaders(),
             },
@@ -18,7 +18,7 @@ export class AiClientService {
 
         console.log('response :>> ', response);
 
-        return response;
+        return response.data;
     }
 
     private getMockCars() {
