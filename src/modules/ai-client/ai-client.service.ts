@@ -16,6 +16,8 @@ export class AiClientService {
             },
         });
 
+        console.log('response :>> ', response);
+
         return response;
     }
 
