@@ -10,7 +10,7 @@ export class AiClientService {
             contentType: image.mimetype,
         });
 
-        const response: ICarsResponse = await axios.post('https://target-service.com/upload', form, {
+        const response: ICarsResponse = await axios.post('http://host.docker.internal:8000/detect', form, {
             headers: {
                 ...form.getHeaders(),
             },
