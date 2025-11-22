@@ -2,6 +2,7 @@ import express, { Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import { AppRouter } from './server.router';
+import helmet from 'helmet';
 import { errorHandler } from './middlewares/error-hendler.middleware';
 
 dotenv.config();
@@ -20,6 +21,8 @@ app.use(
         credentials: true,
     })
 );
+
+app.use(helmet());
 
 app.use(express.json());
 
