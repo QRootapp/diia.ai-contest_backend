@@ -7,13 +7,15 @@ export class S3UploaderService {
 
     constructor() {
         this.client = new S3Client({
-            region: process.env.AWS_REGION!,
+            region: process.env.SPACES_REGION!,
+            endpoint: process.env.SPACES_ENDPOINT!,
             credentials: {
-                accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+                accessKeyId: process.env.SPACES_ACCESS_KEY_ID!,
+                secretAccessKey: process.env.SPACES_SECRET_ACCESS_KEY!,
             },
+            forcePathStyle: false,
         });
-        this.bucket = process.env.AWS_BUCKET!;
+        this.bucket = process.env.SPACES_BUCKET!;
     }
 
     public async uploadFile(file: Express.Multer.File, fileName: string): Promise<string> {
@@ -26,15 +28,12 @@ export class S3UploaderService {
                 Key: key,
                 Body: file.buffer,
                 ContentType: file.mimetype,
+                ACL: 'public-read',
             },
         });
 
         await upload.done();
 
         return key;
-    }
-
-    public getPublicUrl(key: string): string {
-        return `https://${this.bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
     }
 }

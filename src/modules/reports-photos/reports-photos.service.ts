@@ -13,8 +13,8 @@ export class ReportsPhotosService {
     private readonly bucket: string;
 
     constructor(private readonly s3UploaderService: S3UploaderService, private readonly reportsPhotosRepository: ReportsPhotosRepository) {
-        this.region = process.env.AWS_REGION!;
-        this.bucket = process.env.AWS_BUCKET!;
+        this.region = process.env.SPACES_REGION!;
+        this.bucket = process.env.SPACES_BUCKET!;
     }
 
     public async savePhotoInStorage(file: Express.Multer.File, fileName: string) {
@@ -56,6 +56,6 @@ export class ReportsPhotosService {
     }
 
     private buildPhotoUrl(fileName: string) {
-        return `https://s3.${this.region}.amazonaws.com/${this.bucket}/${fileName}`;
+        return `https://${this.bucket}.${this.region}.digitaloceanspaces.com/${fileName}`;
     }
 }
